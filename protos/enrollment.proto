@@ -1,0 +1,75 @@
+// SHARED CONTRACT - do not rename/remove fields. Only ADD new fields (with new numbers)
+// and tell the team before merging. After any change, re-run: python gen_protos.py
+syntax = "proto3";
+package enroll;
+
+// ---- Auth node (Person 1) ----
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginReply);
+}
+
+// ---- Course node (Person 2) ----
+service CourseService {
+  rpc ListCourses(Token) returns (CourseList);
+  rpc Enroll(EnrollRequest) returns (Result);
+}
+
+// ---- Grade node (Person 3) ----
+service GradeService {
+  rpc GetGrades(Token) returns (GradeList);        // student: own grades
+  rpc UploadGrade(UploadRequest) returns (Result); // faculty only
+}
+
+message Token { string jwt = 1; }
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+message LoginReply {
+  bool ok = 1;
+  string jwt = 2;
+  string role = 3;   // "student" | "faculty"
+  string msg = 4;
+}
+
+message Course {
+  string code = 1;
+  string title = 2;
+  int32 slots = 3;     // capacity
+  int32 enrolled = 4;  // current count
+  bool is_open = 5;    // false if closed or full
+  bool i_am_enrolled = 6;  // true if the caller (from JWT) is enrolled
+}
+message CourseList {
+  bool ok = 1;
+  string msg = 2;
+  repeated Course courses = 3;
+}
+
+message EnrollRequest {
+  string jwt = 1;
+  string course_code = 2;
+}
+
+message Grade {
+  string course_code = 1;
+  string grade = 2;    // e.g. "4.0", "3.5", "INC"
+}
+message GradeList {
+  bool ok = 1;
+  string msg = 2;
+  repeated Grade grades = 3;
+}
+
+message UploadRequest {
+  string jwt = 1;          // must be a faculty token
+  string student = 2;      // username
+  string course_code = 3;
+  string grade = 4;
+}
+
+message Result {
+  bool ok = 1;
+  string msg = 2;
+}
