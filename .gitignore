@@ -1,5 +1,5 @@
 .venv/
 __pycache__/
 *.db
-enrollment_pb2.py
-enrollment_pb2_grpc.py
+protos/enrollment_pb2.py
+protos/enrollment_pb2_grpc.py
