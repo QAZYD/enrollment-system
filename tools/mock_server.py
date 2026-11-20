@@ -3,9 +3,9 @@
 Runs each fake service on its REAL port (from common/config.py), so the view
 needs no changes when switching to the real services.
 
-    python mock_server.py                 # all three services up
-    python mock_server.py --down grade    # simulate the grade node being offline
-    python mock_server.py --down auth course
+    python -m tools.mock_server                 # all three services up
+    python -m tools.mock_server --down grade    # simulate the grade node being offline
+    python -m tools.mock_server --down auth course
 
 Login with any user from common/seed_data.py (password: "password").
 State is in memory and resets on restart.
@@ -15,8 +15,8 @@ from concurrent import futures
 
 import grpc
 
-import enrollment_pb2 as pb
-import enrollment_pb2_grpc as rpc
+from protos import enrollment_pb2 as pb
+from protos import enrollment_pb2_grpc as rpc
 from common import config, jwt_util, seed_data
 
 # ---- in-memory state ----
