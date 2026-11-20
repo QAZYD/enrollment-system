@@ -9,8 +9,8 @@ from typing import Any
 
 import grpc
 
-import enrollment_pb2 as pb
-import enrollment_pb2_grpc as rpc
+from protos import enrollment_pb2 as pb
+from protos import enrollment_pb2_grpc as rpc
 from common import config
 
 

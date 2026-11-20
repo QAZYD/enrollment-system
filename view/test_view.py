@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import grpc
 import jwt
 
-import enrollment_pb2 as pb
+from protos import enrollment_pb2 as pb
 from common import config, jwt_util
 from view.app import JWT_COOKIE_NAME, create_app
 from view.grpc_client import EnrollmentGrpcClient, RpcOutcome

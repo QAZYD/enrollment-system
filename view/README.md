@@ -7,7 +7,7 @@ Stateless Flask MVC frontend bound to `0.0.0.0:config.VIEW_PORT` (default `5000`
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe gen_protos.py
+.\.venv\Scripts\python.exe gen_protos.py   # creates protos/enrollment_pb2.py + protos/enrollment_pb2_grpc.py
 ```
 
 ## Running Locally Against the Mock Server
@@ -15,7 +15,7 @@ python -m venv .venv
 Terminal 1 (mock backends on ports `50051`–`50053`):
 
 ```powershell
-.\.venv\Scripts\python.exe mock_server.py
+.\.venv\Scripts\python.exe -m tools.mock_server
 ```
 
 Terminal 2 (view node on `http://localhost:5000`):
@@ -24,9 +24,21 @@ Terminal 2 (view node on `http://localhost:5000`):
 .\.venv\Scripts\python.exe -m view.app
 ```
 
+Check which nodes are up from a third terminal:
+
+```powershell
+.\.venv\Scripts\python.exe -m tools.check_nodes
+```
+
+Or run real nodes together (including Person 1's `python -m services.auth.server`):
+
+```powershell
+.\.venv\Scripts\python.exe -m tools.run_all
+```
+
 Seed accounts (`common/seed_data.py`, password `password`): `student1`, `student2`, `student3` (`student`), `faculty1` (`faculty`).
 
-Stop `mock_server.py` (`Ctrl+C`) before running real services because they use the same ports.
+Stop `tools.mock_server` (`Ctrl+C`) before running real services because they use the same ports.
 
 ## Automated Tests
 
@@ -45,10 +57,10 @@ Stop `mock_server.py` (`Ctrl+C`) before running real services because they use t
 
 ## Fault-Tolerance Demonstration Sequence
 
-Note: Restarting `mock_server.py` resets its in-memory enrollments and grades. For persistent state across individual service restarts, coordinate independent real-service shutdown/restart testing with Person 1.
+Note: Restarting `tools.mock_server` resets its in-memory enrollments and grades. For persistent state across individual service restarts, coordinate independent real-service testing with Person 1 using `python -m services.auth.server` or `python -m tools.run_all --skip <node>`.
 
-1. Start all services (`python mock_server.py`) and `python -m view.app`. Sign in as `student1` (`password`).
-2. **Grade node down:** Restart mock with `python mock_server.py --down grade`. Refresh `/grades` → shows **Grade service unavailable**. Navigate to `/courses` and enroll → continues working.
-3. **Course node down:** Restart mock with `python mock_server.py --down course`. Refresh `/courses` → shows **Course service unavailable**. Navigate to `/grades` (or `/grades/upload` as `faculty1`) → continues working.
-4. **Auth node down:** While already signed in, restart mock with `python mock_server.py --down auth`. Browse `/courses` and `/grades`, then click **Sign out** → existing valid cookie keeps working and logout succeeds locally. Try signing in again → `/login` shows **Auth service unavailable**.
-5. **Recovery:** Restart mock with `python mock_server.py` (no flags) and retry `/login` without restarting `view.app` → view reconnects cleanly.
+1. Start all services (`python -m tools.mock_server`) and `python -m view.app`. Sign in as `student1` (`password`).
+2. **Grade node down:** Restart mock with `python -m tools.mock_server --down grade`. Refresh `/grades` → shows **Grade service unavailable**. Navigate to `/courses` and enroll → continues working.
+3. **Course node down:** Restart mock with `python -m tools.mock_server --down course`. Refresh `/courses` → shows **Course service unavailable**. Navigate to `/grades` (or `/grades/upload` as `faculty1`) → continues working.
+4. **Auth node down:** While already signed in, restart mock with `python -m tools.mock_server --down auth`. Browse `/courses` and `/grades`, then click **Sign out** → existing valid cookie keeps working and logout succeeds locally. Try signing in again → `/login` shows **Auth service unavailable**.
+5. **Recovery:** Restart mock with `python -m tools.mock_server` (no flags) and retry `/login` without restarting `view.app` → view reconnects cleanly.
