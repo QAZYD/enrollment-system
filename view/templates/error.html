@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="error-box" aria-labelledby="main-content">
+  <h1 id="main-content" tabindex="-1">{{ title }}</h1>
+  <p>{{ message }}</p>
+  <a class="btn-primary" href="{{ back_url }}">{{ back_label }}</a>
+</section>
+{% endblock %}

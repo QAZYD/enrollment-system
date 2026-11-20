@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Courses{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 id="main-content" tabindex="-1">Courses</h1>
+  {% if current_user.role == 'student' %}
+  <p class="page-subtitle">Browse available courses and enroll in open sections.</p>
+  {% else %}
+  <p class="page-subtitle">Read-only course directory showing current enrollment counts.</p>
+  {% endif %}
+</div>
+
+{% if service_error %}
+<section class="service-panel" role="alert">
+  <h2>Course service unavailable</h2>
+  <p>{{ service_error }}</p>
+  <div class="panel-actions">
+    <a class="btn-secondary" href="{{ url_for('courses') }}">Retry Courses</a>
+    {% if current_user.role == 'student' %}
+    <a class="text-link" href="{{ url_for('grades') }}">Go to My grades</a>
+    {% else %}
+    <a class="text-link" href="{{ url_for('upload_grade') }}">Go to Upload grade</a>
+    {% endif %}
+  </div>
+</section>
+{% elif error_msg %}
+<div class="alert alert-error" role="alert">
+  <strong>Unable to load courses:</strong> {{ error_msg }}
+</div>
+{% elif courses %}
+<p class="table-meta">{{ courses|length }} {{ 'course' if courses|length == 1 else 'courses' }}</p>
+<div class="table-wrapper" tabindex="0" role="region" aria-labelledby="main-content">
+  <table class="courses-table">
+    <caption class="visually-hidden">Course catalog and enrollment status</caption>
+    <thead>
+      <tr>
+        <th scope="col">Course</th>
+        <th scope="col">Enrolled / capacity</th>
+        <th scope="col">Status</th>
+        {% if current_user.role == 'student' %}
+        <th scope="col">Action</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in courses %}
+      <tr>
+        <th scope="row">
+          <div class="course-code">{{ course.code }}</div>
+          <div class="course-title">{{ course.title }}</div>
+        </th>
+        <td class="num-cell" data-label="Enrolled / capacity">{{ course.enrolled }} / {{ course.slots }}</td>
+        <td data-label="Status">
+          {% if course.status == 'Open' %}
+            <span class="status-indicator status-open">
+              <span class="status-dot" aria-hidden="true"></span>Open
+            </span>
+          {% elif course.status == 'Full' %}
+            <span class="badge-full">Full</span>
+          {% else %}
+            <span class="status-indicator status-closed">Closed</span>
+          {% endif %}
+        </td>
+        {% if current_user.role == 'student' %}
+        <td data-label="Action">
+          {% if course.i_am_enrolled %}
+            <span class="status-enrolled">
+              <svg class="icon-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>Enrolled
+            </span>
+          {% elif course.can_enroll %}
+            <form method="post" action="{{ url_for('enroll') }}" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="course_code" value="{{ course.code }}">
+              <button type="submit" class="btn-primary btn-sm">
+                Enroll<span class="visually-hidden"> in {{ course.code }}</span>
+              </button>
+            </form>
+          {% else %}
+            <span class="muted-label" aria-label="Not open for enrollment">—</span>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <p>No courses are available right now.</p>
+</div>
+{% endif %}
+{% endblock %}
