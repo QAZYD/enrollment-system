@@ -3,3 +3,4 @@ __pycache__/
 *.db
 protos/enrollment_pb2.py
 protos/enrollment_pb2_grpc.py
+.DS_Store
