@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+<section class="login-shell" aria-labelledby="main-content">
+  <h1 id="main-content" tabindex="-1">Sign in</h1>
+  <p class="page-subtitle">Sign in with your enrollment account to access courses and grades.</p>
+
+  {% if service_error %}
+  <div class="service-panel" role="alert">
+    <h2>Auth service unavailable</h2>
+    <p>{{ service_error }}</p>
+  </div>
+  {% elif error_msg %}
+  <div class="alert alert-error" role="alert">
+    <strong>Sign-in failed:</strong> {{ error_msg }}
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('login') }}" aria-labelledby="main-content">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        value="{{ username }}"
+        autocomplete="username"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        autocomplete="current-password"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn-primary btn-block">Sign in</button>
+  </form>
+</section>
+{% endblock %}

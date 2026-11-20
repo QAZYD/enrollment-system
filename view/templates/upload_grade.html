@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Upload grade{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 id="main-content" tabindex="-1">Upload grade</h1>
+  <p class="page-subtitle">Enter a student username, course code, and grade.</p>
+</div>
+
+{% if service_error %}
+<section class="service-panel" role="alert">
+  <h2>Grade service unavailable</h2>
+  <p>{{ service_error }}</p>
+  <div class="panel-actions">
+    <a class="btn-secondary" href="{{ url_for('upload_grade') }}">Reset page</a>
+    <a class="text-link" href="{{ url_for('courses') }}">Go to Courses</a>
+  </div>
+</section>
+{% elif error_msg %}
+<div class="alert alert-error" role="alert">
+  <strong>Grade not saved:</strong> {{ error_msg }}
+</div>
+{% endif %}
+
+<section class="form-panel" aria-labelledby="main-content">
+  <form method="post" action="{{ url_for('upload_grade') }}" aria-labelledby="main-content">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group">
+      <label for="student">Student username</label>
+      <input
+        type="text"
+        id="student"
+        name="student"
+        value="{{ form_values.student }}"
+        aria-describedby="student-hint"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+        required
+      >
+      <span id="student-hint" class="field-hint">Example: student1</span>
+    </div>
+
+    <div class="form-group">
+      <label for="course_code">Course code</label>
+      <input
+        type="text"
+        id="course_code"
+        name="course_code"
+        value="{{ form_values.course_code }}"
+        aria-describedby="course-hint"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+        required
+      >
+      <span id="course-hint" class="field-hint">Example: CS101</span>
+    </div>
+
+    <div class="form-group">
+      <label for="grade">Grade</label>
+      <input
+        type="text"
+        id="grade"
+        name="grade"
+        value="{{ form_values.grade }}"
+        aria-describedby="grade-hint"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+        required
+      >
+      <span id="grade-hint" class="field-hint">Example: 4.0, 3.5, or INC</span>
+    </div>
+
+    <button type="submit" class="btn-primary">Save grade</button>
+    <p class="form-note">Saving the same student and course combination updates its existing entry.</p>
+  </form>
+</section>
+{% endblock %}
