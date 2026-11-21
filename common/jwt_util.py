@@ -19,7 +19,7 @@ def make(username: str, role: str) -> str:
 
 def verify(token: str) -> dict:
     """Return the claims {sub, role, iat, exp}. Raises jwt.InvalidTokenError if bad/expired."""
-    return jwt.decode(token, SECRET, algorithms=[ALGO])
+    return jwt.decode(token, SECRET, algorithms=[ALGO], leeway=30)
 
 
 def claims_or_none(token: str):
